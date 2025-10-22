@@ -1,0 +1,18 @@
+# Visual Studio specific
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+[Bb]in/
+[Oo]bj/
+
+# Other
+*.VC.db
+*.opensdf
+*.sdf
+ipch/
