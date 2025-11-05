@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphics\Objects\ChainManager.cpp" />
     <ClCompile Include="src\Controllers\Camera\Camera.cpp" />
     <ClCompile Include="src\Controllers\Camera\OrbitalCamera.cpp" />
     <ClCompile Include="src\Globals\Globals.cpp" />
@@ -342,6 +343,7 @@
     <None Include="src\Libraries\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Objects\ChainManager.h" />
     <ClInclude Include="src\Controllers\Camera\Camera.h" />
     <ClInclude Include="src\Controllers\Camera\OrbitalCamera.h" />
     <ClInclude Include="src\Globals\Globals.h" />

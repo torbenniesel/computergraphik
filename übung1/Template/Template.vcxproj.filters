@@ -105,6 +105,9 @@
     <ClCompile Include="src\Controllers\Camera\OrbitalCamera.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\Objects\ChainManager.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Libraries\glm\detail\func_common.inl">
@@ -1524,6 +1527,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\Controllers\Camera\OrbitalCamera.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Objects\ChainManager.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

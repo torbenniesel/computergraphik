@@ -144,7 +144,7 @@ public:
         for (i = 0; i < slices + 1; i++)
         {
             float currentAngle = angleStep * i;
-            
+
             vertices.push_back(Vertex(glm::vec3(cosf(currentAngle) * radius, -halfExtend, -sinf(currentAngle) * radius), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f,0.0f)));
         }
 

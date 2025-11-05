@@ -2,7 +2,7 @@
 
 Camera::Camera()
 {
-	position = glm::vec3(15.0f, 15.0f, 15.0f);
+	position = glm::vec3(15.0f, 15.0f, 30.0f);
 	center = glm::vec3(0);
 	up = glm::vec3(0, 1.0f, 0);
 	aspect = 16.9f; 

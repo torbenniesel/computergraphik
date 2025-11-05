@@ -29,6 +29,21 @@ public:
 	void SetAlpha(float factor = 1.0f);
 	void ResetAlpha();
 
+	//Adding position and rotation capabilities
+	// Setters
+	void SetPosition(const glm::vec3& newPosition);
+	void SetRotation(const glm::vec3& newRotation);
+	void SetSize(const glm::vec3& newSize);
+
+	// Getters
+	glm::vec3 GetPosition() const;
+	glm::vec3 GetRotation() const;
+	glm::vec3 GetSize() const;
+
+	// Methods for incremental updates
+	void Translate(const glm::vec3& translation);
+	void Rotate(const glm::vec3& rot);
+
 
 protected:
 	bool noTex;

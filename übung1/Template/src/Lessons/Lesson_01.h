@@ -69,10 +69,23 @@ namespace PrakCG {
 
 		// declaration of Cube instance
 		Cube cube;
+		Model customModel;
+		Cylinder cylinder;
+		Cylinder cylinder2;
+		Cylinder cylinder3;
+		Model chainLinkIn;
+		Model chainLinkOut;
+		Model gearBig;
+		Model gearSmall;
 
 		// TODO U00.1: camera movement
 		glm::vec3 cPosDiff;
 		glm::vec3 cCenterDiff;
 		glm::vec3 cUpDiff;
+
+		// Trying random stuff
+		bool allowRotating;
+		bool allowMoving;
+		bool allowCameraMovement;
 	};
 }

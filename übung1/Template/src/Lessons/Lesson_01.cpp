@@ -12,6 +12,8 @@
 
 #include "Graphics/Material/Material.h"
 
+#include "Graphics/Objects/ChainManager.h"
+
 namespace PrakCG {
 
 	/////////////////////////////////////////////////////////////////
@@ -19,6 +21,9 @@ namespace PrakCG {
 	/////////////////////////////////////////////////////////////////
 
 	// constructor: initialization
+	std::vector<ChainLink> chainLinks;
+	std::vector<Sphere> sphereList;
+	std::vector<Model> chainLinkList;
 	Lesson1::Lesson1() :
 		coordSystem(-10, 10, -10, 10, -10, 10),
 		wireframeOn(false),
@@ -43,14 +48,117 @@ namespace PrakCG {
 		
 		// init lamps
 		SetupLights();
+
+		chainLinkOut = Model(glm::vec3(1.0f, 0, 0));
+		chainLinkOut.LoadModel("res/Blender/CHAIN_LINK_OUT.fbx");
+
+		chainLinkIn = Model(glm::vec3(1.0f, 0.22f, 0));
+		chainLinkIn.LoadModel("res/Blender/CHAIN_LINK_IN.fbx");
+		
+
+		gearBig = Model(glm::vec3(0, 0, 0));
+		gearBig.LoadModel("res/Blender/GEAR_BIG.fbx");
+
+		gearSmall = Model(glm::vec3(0, 0, 0));
+		gearSmall.LoadModel("res/Blender/GEAR_SMALL.fbx");
+
+
+		ChainManager chainManager = ChainManager();
+		chainLinks = chainManager.CreateChainLinks();
+		float size = chainLinks.size();
+		printf("Size= %4.2f \n", size);
+		
+		//Create spheres for each chainLink
+		int index = 0;
+		for (const auto& link : chainLinks) {
+			
+			// Create a small sphere at each chain link position
+			// Convert 2D position to 3D (using z = 0)
+			glm::vec3 spherePos = glm::vec3(link.position.x, link.position.y, 0.0f);
+
+			// Create sphere with small radius, positioned at the link location
+			//Sphere sphere(
+			//	0.2f,           // radius
+			//	20,             // slices
+			//	20,             // stacks
+			//	Color::blue,    // color
+			//	spherePos,      // position
+			//	glm::vec3(1.0f), // size (no scaling)
+			//	glm::vec3(0.0f)  // rotation
+			//);
+			if (index % 2 == 0) {
+				Model chainLinkOutCopy = chainLinkOut;
+				chainLinkOutCopy.SetPosition(spherePos);
+				chainLinkList.push_back(chainLinkOutCopy);
+			}
+			else {
+				Model chainLinkInCopy = chainLinkIn;
+				chainLinkInCopy.SetPosition(spherePos);
+				chainLinkList.push_back(chainLinkInCopy);
+			}
+
+			
+			
+			index++;
+			//glm::vec2 newSpherePos = link.position + glm::vec2(cos(link.rotation.x), sin(link.rotation.x)) * 0.2f;
+
+			//Sphere sphere2(
+			//	0.1f,           // radius
+			//	20,             // slices
+			//	20,             // stacks
+			//	Color::green,    // color
+			//	glm::vec3(newSpherePos.x, newSpherePos.y, 0.0f),
+			//	glm::vec3(1.0f), // size (no scaling)
+			//	glm::vec3(0.0f)  // rotation
+			//);
+			//sphereList.push_back(sphere2);
+
+			//newSpherePos = link.position + glm::vec2(cos(link.rotation.x), sin(link.rotation.x)) * 0.4f;
+
+			//Sphere sphere3(
+			//	0.1f,           // radius
+			//	20,             // slices
+			//	20,             // stacks
+			//	Color::green,    // color
+			//	glm::vec3(newSpherePos.x, newSpherePos.y, 0.0f),
+			//	glm::vec3(1.0f), // size (no scaling)
+			//	glm::vec3(0.0f)  // rotation
+			//);
+			//sphereList.push_back(sphere3);
+
+			//newSpherePos = link.position + glm::vec2(cos(link.rotation.x), sin(link.rotation.x)) * 0.6f;
+
+			//Sphere sphere4(
+			//	0.1f,           // radius
+			//	20,             // slices
+			//	20,             // stacks
+			//	Color::green,    // color
+			//	glm::vec3(newSpherePos.x, newSpherePos.y, 0.0f),
+			//	glm::vec3(1.0f), // size (no scaling)
+			//	glm::vec3(0.0f)  // rotation
+			//);
+			//sphereList.push_back(sphere4);
+		}
+
+		 
 		
 		// init the cube model, use wood texture
-		cube = Cube(1.0f, { "res/textures/wood.jpg" }, { aiTextureType_DIFFUSE });
+		cube = Cube(0.001f, { "res/textures/wood.jpg" }, { aiTextureType_DIFFUSE }, glm::vec3(0,0,0));
+		cube.SetAlpha(0);
+
+		/*customModel = Model(glm::vec3(0, 0, 0));
+		customModel.LoadModel("res/Blender/chainlink.fbx");
+		customModel.SetAlpha(0.0f);
+		customModel.SetSize(glm::vec3(0.1f));*/
+
+		//cylinder = Cylinder(1.0f, 2.0f, 3, Color::blue);
+		//cylinder2 = Cylinder(1.0f, 2.0f, 3, Color::green, glm::vec3(1.5f, 0, 0), glm::vec3(1.0f), glm::vec3(0));
 	}
 
 	// destructor: cleanup 
 	Lesson1::~Lesson1() {
-		cube.Cleanup();
+		//cube.Cleanup();
+		customModel.Cleanup();
 		coordSystem.Cleanup();
 		shader.Cleanup();
 	}
@@ -242,6 +350,68 @@ namespace PrakCG {
 			}
 		}
 
+		float movingSpeed = 1.0f;		// Units per second
+		float rotationSpeed = 90.0f;	// Degrees per second
+		float moveStep = 0.2f;			// How many units to move per key press (20%)
+		float rotationStep = 15.0f;		// How many degrees to rotate per key press
+		// --- ROTATION LOGIC ---
+		if (allowRotating == true) {
+			if (KeyBoard::key(GLFW_KEY_RIGHT)) {
+				chainLinkIn.Rotate(glm::vec3(0.0f, -rotationSpeed * (float)deltaTime, 0.0f));
+			}
+			if (KeyBoard::key(GLFW_KEY_LEFT)) {
+				chainLinkIn.Rotate(glm::vec3(0.0f, rotationSpeed * (float)deltaTime, 0.0f));
+			}
+
+			if (KeyBoard::key(GLFW_KEY_UP)) {
+				chainLinkIn.Rotate(glm::vec3(0.0f, 0.0f, rotationSpeed * (float)deltaTime));
+			}
+			if (KeyBoard::key(GLFW_KEY_DOWN)) {
+				chainLinkIn.Rotate(glm::vec3(0.0f, 0.0f, -rotationSpeed * (float)deltaTime));
+			}
+		}
+
+		// --- MOVEMENT LOGIC ---
+		if (allowMoving == true) {
+			if (KeyBoard::key(GLFW_KEY_RIGHT)) {
+				chainLinkIn.Translate(glm::vec3(movingSpeed * (float)deltaTime, 0.0f, 0.0f));
+			}
+			if (KeyBoard::key(GLFW_KEY_LEFT)) {
+				chainLinkIn.Translate(glm::vec3(-movingSpeed * (float)deltaTime, 0.0f, 0.0f));
+			}
+
+			if (KeyBoard::key(GLFW_KEY_UP) && !KeyBoard::key(GLFW_KEY_LEFT_SHIFT)) {
+				chainLinkIn.Translate(glm::vec3(0.0f, 0.0f, -movingSpeed * (float)deltaTime));
+			}
+			if (KeyBoard::key(GLFW_KEY_UP) && KeyBoard::key(GLFW_KEY_LEFT_SHIFT)) {
+				chainLinkIn.Translate(glm::vec3(0.0f, movingSpeed * (float)deltaTime, 0.0f));
+			}
+
+			if (KeyBoard::key(GLFW_KEY_DOWN) && !KeyBoard::key(GLFW_KEY_LEFT_SHIFT)) {
+				chainLinkIn.Translate(glm::vec3(0.0f, 0.0f, movingSpeed * (float)deltaTime));
+			}
+			if (KeyBoard::key(GLFW_KEY_DOWN) && KeyBoard::key(GLFW_KEY_LEFT_SHIFT)) {
+				chainLinkIn.Translate(glm::vec3(0.0f, -movingSpeed * (float)deltaTime, 0.0f));
+			}
+		}
+
+		if (KeyBoard::key(GLFW_KEY_W)) {
+			int index = 0;
+			for (auto& chainLink : chainLinkList) {
+				glm::vec3 pos = chainLinkIn.GetPosition();
+				if (index == 0) {
+					printf("Pos: (%4.2f, %4.2f, %4.2f)  Delta: %4.2f\n", pos.x, pos.y, pos.z, (float)deltaTime);
+				}
+				float movingSpeed = 1.0f;
+
+				chainLinkIn.SetPosition(glm::vec3(pos.x, pos.y + movingSpeed * (float)deltaTime, pos.z));
+				index++;
+			}
+			
+		}
+
+		
+
 		// zooming with the mouse wheel:
 		// modify the "focal lenght" of the camera  
 		if (Mouse::hasScrolled) {
@@ -261,6 +431,16 @@ namespace PrakCG {
 		ImGui::Text("Select the active lights: ");
 		ImGui::Checkbox("Global Ambient Light", &ambLightOn);
 		ImGui::Checkbox("Directional Light", &dirLightOn);
+		if (ImGui::Checkbox("Allow movement by arrow", &allowMoving)) {
+			if (allowMoving) {
+				allowRotating = false;
+			}
+		}
+		if (ImGui::Checkbox("Allow rotate by arrow", &allowRotating)) {
+			if (allowRotating) {
+				allowMoving = false;
+			}
+		}
 		ImGui::NewLine();
 
 		if (ImGui::RadioButton("Default cam", useOrbitalCamera == false)) {
@@ -293,7 +473,7 @@ namespace PrakCG {
 		// TODO U00.1: calculate the new camera parameters
 		// and update the private object "camera"
 		// ...
-
+		
 	}
 
 	// render one frame of your scene here
@@ -303,9 +483,31 @@ namespace PrakCG {
 	{
 		matrixStack.PushMatrix();
 		{
-			matrixStack.Scale(6.0f, 6.0f, 6.0f);
-			cube.Render(shader, matrixStack.GetMatrix());
+			matrixStack.Scale(1.0f, 1.0f, 1.0f);
+			//cube.Render(shader, matrixStack.GetMatrix());
+			//customModel.Render(shader, matrixStack.GetMatrix());
+			//cylinder.Render(shader, matrixStack.GetMatrix());
+			//cylinder2.Render(shader, matrixStack.GetMatrix());
+			chainLinkIn.Render(shader, matrixStack.GetMatrix());
+			chainLinkOut.Render(shader, matrixStack.GetMatrix());
+			//gearBig.Render(shader, matrixStack.GetMatrix());
+			//gearSmall.Render(shader, matrixStack.GetMatrix());
 		}
+		
+
+		/*for (auto& sphere : sphereList) {
+			sphere.Render(shader, matrixStack.GetMatrix());
+		}*/
+
+		int index = 0;
+		for (auto& chainLink : chainLinkList) {
+			if (index == 0) {
+				glm::vec3 pos = chainLinkIn.GetPosition();
+				printf("Pos: (%4.2f, %4.2f, %4.2f) \n", pos.x, pos.y, pos.z);
+			}
+			chainLink.Render(shader, matrixStack.GetMatrix());
+		}
+
 		matrixStack.PopMatrix();
 	}
 }

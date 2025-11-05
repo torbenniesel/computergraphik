@@ -270,3 +270,39 @@ void Model::ResetAlpha() {
 	for (int i = 0; i < meshes.size(); i++)
 		meshes[i].DisableLocalMaterial();
 }
+
+//Adding position and rotation capabilities
+// Setters
+void Model::SetPosition(const glm::vec3& newPosition) {
+	pos = newPosition;
+}
+
+void Model::SetRotation(const glm::vec3& newRotation) {
+	rotation = newRotation;
+}
+
+void Model::SetSize(const glm::vec3& newSize) {
+	size = newSize;
+}
+
+// Getters
+glm::vec3 Model::GetPosition() const {
+	return pos;
+}
+
+glm::vec3 Model::GetRotation() const {
+	return rotation;
+}
+
+glm::vec3 Model::GetSize() const {
+	return size;
+}
+
+// Methods for incremental updates
+void Model::Translate(const glm::vec3& translation) {
+	pos += translation;
+}
+
+void Model::Rotate(const glm::vec3& rot) {
+	rotation += rot;
+}
