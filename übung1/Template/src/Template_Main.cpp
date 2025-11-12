@@ -12,6 +12,7 @@
 #include "Tests/ClearColor.h"
 #include "Lessons/Introduction.h"
 #include "Lessons/Lesson_01.h"
+#include "Lessons/MyProject.h"
 
 #include "Controllers/Devices/Mouse.h"
 #include "Controllers/Devices/Keyboard.h"
@@ -52,7 +53,8 @@ int main(void) {
 		Menu->RegisterPlugin<PrakCG::TestClearColor>("Clear Color");
 		Menu->RegisterPlugin<PrakCG::Introduction>("Introduction");
 		Menu->RegisterPlugin<PrakCG::Lesson1>("Lesson 01");
-		currentPlugin = new PrakCG::Lesson1;
+		Menu->RegisterPlugin<PrakCG::MyProject>("MyProject");
+		currentPlugin = new PrakCG::MyProject;
 
 		// init depth test to show our 3d scene properly
 		glEnable(GL_DEPTH_TEST);

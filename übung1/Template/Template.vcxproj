@@ -109,6 +109,7 @@
       <AdditionalIncludeDirectories>res;src;src\Libraries;</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +172,7 @@
     <ClCompile Include="src\Controllers\Devices\Joystick.cpp" />
     <ClCompile Include="src\Controllers\Devices\Keyboard.cpp" />
     <ClCompile Include="src\Lessons\Lesson_01.cpp" />
+    <ClCompile Include="src\Lessons\MyProject.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
     <ClCompile Include="src\Controllers\Devices\Mouse.cpp" />
     <ClCompile Include="src\Graphics\COS\Coordinatesystem.cpp" />
@@ -355,6 +357,9 @@
     <ClInclude Include="src\Controllers\Devices\Joystick.h" />
     <ClInclude Include="src\Controllers\Devices\Keyboard.h" />
     <ClInclude Include="src\Lessons\Lesson_01.h" />
+    <ClInclude Include="src\Lessons\MyProject.h" />
+    <ClInclude Include="src\Project\Geometry.h" />
+    <ClInclude Include="src\Project\Utils.h" />
     <ClInclude Include="src\Window\Window.h" />
     <ClInclude Include="src\Controllers\Devices\Mouse.h" />
     <ClInclude Include="src\Graphics\COS\Coordinatesystem.h" />

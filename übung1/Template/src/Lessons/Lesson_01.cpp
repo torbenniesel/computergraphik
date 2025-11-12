@@ -58,6 +58,21 @@ namespace PrakCG {
 
 		gearBig = Model(glm::vec3(0, 0, 0));
 		gearBig.LoadModel("res/Blender/GEAR_BIG.fbx");
+		gearBig2 = Model(glm::vec3(0, 0, 0));
+		gearBig2.LoadModel("res/Blender/GEAR_BIG.fbx");
+		glm::vec2 M1 = { 4.0f, 0 };
+		glm::vec2 M2 = { -4.0f, 8.0f };
+		float Radius = 0.01f;
+		gearBig.SetPosition(glm::vec3(M1.x,M1.y,0.0f));
+		gearBig2.SetPosition(glm::vec3(M2.x, M2.y, 0.0f));
+		gearBig.SetSize(glm::vec3(0.0172f));
+		gearBig2.SetSize(glm::vec3(0.0168f));
+		gearBig.SetRotation(glm::vec3(90, 0, 0));
+		gearBig2.SetRotation(glm::vec3(90, 0, 0));
+		gearBig2.SetColor(Color::blue);
+
+		
+		
 
 		gearSmall = Model(glm::vec3(0, 0, 0));
 		gearSmall.LoadModel("res/Blender/GEAR_SMALL.fbx");
@@ -86,14 +101,22 @@ namespace PrakCG {
 			//	glm::vec3(1.0f), // size (no scaling)
 			//	glm::vec3(0.0f)  // rotation
 			//);
+			
+
 			if (index % 2 == 0) {
 				Model chainLinkOutCopy = chainLinkOut;
 				chainLinkOutCopy.SetPosition(spherePos);
+				chainLinkOutCopy.SetSize(chainLinkOutCopy.GetSize() * 2.0f);
+				glm::vec3 startRotation = glm::vec3(0, 0, link.rotation.x * 180.0f / M_PI - 90.0f);
+				chainLinkOutCopy.SetRotation(startRotation);
 				chainLinkList.push_back(chainLinkOutCopy);
 			}
 			else {
 				Model chainLinkInCopy = chainLinkIn;
 				chainLinkInCopy.SetPosition(spherePos);
+				chainLinkInCopy.SetSize(chainLinkInCopy.GetSize() * 2.0f);
+				glm::vec3 startRotation = glm::vec3(0, 0, link.rotation.x * 180.0f / M_PI - 90.0f);
+				chainLinkInCopy.SetRotation(startRotation);
 				chainLinkList.push_back(chainLinkInCopy);
 			}
 
@@ -161,6 +184,11 @@ namespace PrakCG {
 		customModel.Cleanup();
 		coordSystem.Cleanup();
 		shader.Cleanup();
+
+		for (auto& chainLink : chainLinkList) {
+			chainLink.Cleanup();
+		}
+
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -395,19 +423,98 @@ namespace PrakCG {
 			}
 		}
 
-		if (KeyBoard::key(GLFW_KEY_W)) {
+		if (KeyBoard::key(GLFW_KEY_T)) {
 			int index = 0;
+			int size = chainLinkList.size();
 			for (auto& chainLink : chainLinkList) {
-				glm::vec3 pos = chainLinkIn.GetPosition();
+				int linkIndex = index % size;
+				glm::vec3 rotation = chainLink.GetRotation();
 				if (index == 0) {
-					printf("Pos: (%4.2f, %4.2f, %4.2f)  Delta: %4.2f\n", pos.x, pos.y, pos.z, (float)deltaTime);
+					printf("T-UP %i: (%4.2f, %4.2f, %4.2f)  Delta: %4.2f\n", linkIndex, rotation.x, rotation.y, rotation.z, (float)deltaTime);
 				}
 				float movingSpeed = 1.0f;
 
-				chainLinkIn.SetPosition(glm::vec3(pos.x, pos.y + movingSpeed * (float)deltaTime, pos.z));
+				//chainLink.SetRotation(glm::vec3(rotation.x, rotation.y, rotation.z + rotationSpeed * (float)deltaTime));
+				chainLinkList[linkIndex].SetRotation(glm::vec3(rotation.x, rotation.y, rotation.z + rotationSpeed * (float)deltaTime));
+
 				index++;
 			}
 			
+		}
+		if (KeyBoard::key(GLFW_KEY_G)) {
+			int index = 0;
+			for (auto& chainLink : chainLinkList) {
+				glm::vec3 rotation = chainLink.GetRotation();
+				if (index == 0) {
+					printf("T-UP: (%4.2f, %4.2f, %4.2f)  Delta: %4.2f\n", rotation.x, rotation.y, rotation.z, (float)deltaTime);
+				}
+				float movingSpeed = 1.0f;
+
+				chainLink.SetRotation(glm::vec3(rotation.x, rotation.y, rotation.z + -rotationSpeed * (float)deltaTime));
+				index++;
+			}
+
+		}
+		if (KeyBoard::key(GLFW_KEY_I)) {
+			int index = 0;
+			int size = chainLinkList.size();
+			for (auto& chainLink : chainLinkList) {
+				int nextLinkIdx = (index+1) % size;
+				glm::vec3 rotation = chainLink.GetRotation();
+				
+				float movingSpeed = 1.0f;
+
+				glm::vec3 nextLinkPos = chainLinkList[nextLinkIdx].GetPosition();
+				glm::vec3 direction = glm::normalize(nextLinkPos - chainLink.GetPosition());
+				glm::vec3 newPos = chainLink.GetPosition() + direction * movingSpeed * (float)deltaTime;
+				chainLink.SetPosition(newPos);
+				glm::vec3 newRotation = glm::normalize(nextLinkPos - chainLink.GetPosition());
+				//chainLink.SetRotation(newRotation);
+
+				glm::vec3 dirVec = glm::normalize(nextLinkPos - newPos);
+				float angle = atan2(dirVec.y, dirVec.x) * 180.0f / M_PI;
+				chainLink.SetRotation(glm::vec3(0.0f, 0.0f, angle - 90));
+
+				
+
+				/*if (index == 0 || index == 1) {
+					glm::vec3 newRot = glm::normalize(chainLinkList[nextLinkIdx].GetPosition() - chainLink.GetPosition());
+					rotation = glm::normalize(rotation);
+					printf("T-UP %i: (%4.2f, %4.2f, %4.2f) => (%4.2f, %4.2f, %4.2f)\n", index, rotation.x, rotation.y, rotation.z, newRot.x, newRot.y, newRot.z);
+					
+					glm::vec3 pos = chainLink.GetPosition();
+					glm::vec3 pos2 = nextLinkPos;
+					
+					glm::vec3 nextLinkRot = chainLinkList[nextLinkIdx].GetRotation();
+					float angle2 = atan2(nextLinkRot.y, nextLinkRot.x) * 180.0f / M_PI;
+					printf("T-UP %i: (%4.2f, %4.2f, %4.2f) => (%4.2f, %4.2f, %4.2f) | (%4.2f, %4.2f, %4.2f) Angle: %4.2f, Angle2: %4.2f\n", index, pos.x, pos.y, pos.z, pos2.x, pos2.y, pos2.z, dirVec.x, dirVec.y, dirVec.z, angle, angle2);
+				}*/
+
+
+				index++;
+			}
+
+			float rotSpeed = 20.0f;
+			glm::vec3 curRotation = gearBig.GetRotation();
+			glm::vec3 newRotation = glm::vec3(curRotation.x, curRotation.y - rotSpeed * (float)deltaTime,	curRotation.z);
+			gearBig.SetRotation(newRotation);
+			gearBig2.SetRotation(newRotation);
+			
+
+		}
+		if (KeyBoard::key(GLFW_KEY_K)) {
+			int index = 0;
+			for (auto& chainLink : chainLinkList) {
+				glm::vec3 rotation = chainLink.GetRotation();
+				if (index == 0) {
+					printf("T-UP: (%4.2f, %4.2f, %4.2f)  Delta: %4.2f\n", rotation.x, rotation.y, rotation.z, (float)deltaTime);
+				}
+				float movingSpeed = 1.0f;
+
+				chainLink.SetRotation(glm::vec3(rotation.x, rotation.y, rotation.z + rotationSpeed * (float)deltaTime));
+				index++;
+			}
+
 		}
 
 		
@@ -490,6 +597,8 @@ namespace PrakCG {
 			//cylinder2.Render(shader, matrixStack.GetMatrix());
 			chainLinkIn.Render(shader, matrixStack.GetMatrix());
 			chainLinkOut.Render(shader, matrixStack.GetMatrix());
+			gearBig.Render(shader, matrixStack.GetMatrix());
+			gearBig2.Render(shader, matrixStack.GetMatrix());
 			//gearBig.Render(shader, matrixStack.GetMatrix());
 			//gearSmall.Render(shader, matrixStack.GetMatrix());
 		}
@@ -503,7 +612,6 @@ namespace PrakCG {
 		for (auto& chainLink : chainLinkList) {
 			if (index == 0) {
 				glm::vec3 pos = chainLinkIn.GetPosition();
-				printf("Pos: (%4.2f, %4.2f, %4.2f) \n", pos.x, pos.y, pos.z);
 			}
 			chainLink.Render(shader, matrixStack.GetMatrix());
 		}

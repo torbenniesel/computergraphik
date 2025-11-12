@@ -15,8 +15,39 @@
 #include "Graphics/Models/Cube.hpp"
 #include "Graphics/Models/Sphere.hpp"
 
+
+
+#include <format>
+
+//template <>
+//struct std::formatter<glm::vec3> {
+//	// The parse method is kept simple as we don't need custom format specifiers.
+//	constexpr auto parse(std::format_parse_context& ctx) {
+//		return ctx.begin();
+//	}
+//
+//	// The format method creates the specific output "vec3(%4.2f, %4.2f, %4.2f)".
+//	auto format(const glm::vec3& v, std::format_context& ctx) const {
+//		return std::format_to(ctx.out(), "({:4.2f}, {:4.2f}, {:4.2f})", v.x, v.y, v.z);
+//	}
+//};
+//template <>
+//struct std::formatter<glm::vec2> {
+//	// The parse method is kept simple as we don't need custom format specifiers.
+//	constexpr auto parse(std::format_parse_context& ctx) {
+//		return ctx.begin();
+//	}
+//
+//	// The format method creates the specific output "vec3(%4.2f, %4.2f, %4.2f)".
+//	auto format(const glm::vec2& v, std::format_context& ctx) const {
+//		return std::format_to(ctx.out(), "({:4.2f}, {:4.2f})", v.x, v.y);
+//	}
+//};
+
+
 namespace PrakCG {
 
+	
 	class Lesson1 : public Plugin, Globals
 	{
 	public:
@@ -76,6 +107,7 @@ namespace PrakCG {
 		Model chainLinkIn;
 		Model chainLinkOut;
 		Model gearBig;
+		Model gearBig2; 
 		Model gearSmall;
 
 		// TODO U00.1: camera movement

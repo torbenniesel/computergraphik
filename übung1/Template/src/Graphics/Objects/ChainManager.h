@@ -7,10 +7,13 @@
 #include "Graphics/Shader/Shader.h"
 #include "Graphics/Model/Model.h"
 #include <cmath>
+#include <format>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
+
 
 
 struct ChainLink {
@@ -49,13 +52,16 @@ class ChainManager {
 public:
 	std::vector<ChainLink> chainLinks;
 	std::vector<ChainElement> chainElements;
-	float chainLinkLength = 0.22f;
+	float chainLinkLength = 0.22f * 2;
 	float chainLinkWidth = 0.1f;
 
 	ChainManager() {
 		chainLinks = std::vector<ChainLink>();
 
-		chainLinks = CreateChainLinks();
+		AddChainElement({ CHAIN_ELEMENT_CIRCLE, glm::vec2(1.0f, 0.0f), 2.0f, true });
+		AddChainElement({ CHAIN_ELEMENT_CIRCLE, glm::vec2(-3.0f, 6.66f), 2.0f, true });
+
+		//chainLinks = CreateChainLinks();
 	}
 
 	void Cleanup();
@@ -144,9 +150,9 @@ public:
 		std::vector<ChainElement> chainElements;
 
 		glm::vec2 M1 = { 4.0f, 0 };
-		float R1 = 4.0f;
-		glm::vec2 M2 = { 4.0f, 11.0f };
-		float R2 = 4.0f;
+		float R1 = 3.0f;
+		glm::vec2 M2 = { -4.0f, 8.0f };
+		float R2 = 3.0f;
 		ChainElement C1 = { CHAIN_ELEMENT_CIRCLE, M1, R1, true };
 		ChainElement C2 = { CHAIN_ELEMENT_CIRCLE, M2, R2, true };
 		ChainElement C3 = { CHAIN_ELEMENT_CIRCLE, glm::vec2(8.0f, 2.0f), 1.0f, true};
